@@ -347,6 +347,10 @@ free -h
 # → Swap: 15Gi total, ~0.8Gi used
 cat /sys/module/ttm/parameters/pages_limit  # → 4194304
 ```
+OPTIONA amd-smi
+```bash
+dnf install amdsmi
+```
 
 ### 3.7 Disable GUI (saves ~1 GB)
 
