@@ -302,10 +302,22 @@ Environment=OLLAMA_CONTEXT_LENGTH=65536
 With models consuming 11+ GB on a 16 GB system, NVMe swap is required for surviving inference peaks.
 
 ```bash
-sudo dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress
-sudo chattr +C /swapfile   # disable btrfs copy-on-write
-sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon -p 10 /swapfile
-echo '/swapfile none swap sw,pri=10 0 0' | sudo tee -a /etc/fstab
+# 1. Elimina el archivo anterior
+sudo rm -f /swapfile
+
+# 2. Crea un archivo vacío de 0 bytes
+sudo truncate -s 0 /swapfile
+
+# 3. Desactiva la función Copy-on-Write (atributo +C)
+sudo chattr +C /swapfile
+
+# 4. Asigna el tamaño deseado (ejemplo: 4 GB)
+sudo fallocate -l 4G /swapfile
+
+# 5. Asigna permisos, inicializa y activa
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon -p 10 /swapfile
 ```
 
 In steady state, swap usage is ~400–850 MB (OS buffers pushed out to make room for model weights) — not active paging. SMART data after months of 24/7 operation: **3% wear, 25.4 TB total written**.
